@@ -4,14 +4,18 @@ import numpy as np
 
 
 def mean_sfr(vmax, z, **kwargs):
-    V = vmax/10**logV(z, **kwargs)
+    """
+    """
+    vmax, z = _get_1d_arrays(vmax, z)
+
+    V = 10.**logV(z, **kwargs)
     v = vmax/V
     term1 = 1./(v**alpha(z, **kwargs) + v**beta(z, **kwargs))
 
-    exp_arg = -np.log10(v)**2/(2.*delta(z, **kwargs))
-    term2 = 10**logGamma(z, **kwargs)*np.exp(exp_arg)
+    exp_arg = (-np.log10(v)**2)/(2.*delta_sfr(z, **kwargs))
+    term2 = (10.**logGamma(z, **kwargs))*np.exp(exp_arg)
 
-    return 10**logEpsilon(z, **kwargs)*(term1 + term2)
+    return (10.**logEpsilon(z, **kwargs))*(term1 + term2)
 
 
 def logV(z, logV_0=2.151, logV_a=-1.658, logV_lnz=1.68, logV_z=-0.233, **kwargs):
@@ -26,24 +30,29 @@ def logEpsilon(z, epsilon_0=0.109, epsilon_a=-3.441, epsilon_lnz=5.079, epsilon_
     return log10_epsilon
 
 
-def alpha(z, **kwargs):
+def alpha(z, alpha_0=-5.598, alpha_a=-20.731, alpha_lnz=13.455, alpha_z=-1.321, **kwargs):
     a = 1./(1. + z)
-    return kwargs['alpha_0'] + kwargs['alpha_a']*(a - 1.) + kwargs['alpha_z']*z
+    return alpha_0 + alpha_a*(1.-a) + alpha_lnz*np.log(1.+z) + alpha_z*z
 
 
-def beta(z, **kwargs):
+def beta(z, beta_0=-1.911, beta_a=0.395, beta_z=0.747, **kwargs):
     a = 1./(1. + z)
-    return kwargs['beta_0'] + kwargs['beta_a']*(a - 1.) + kwargs['beta_z']*z
+    return beta_0 + beta_a*(1.-a) + beta_z*z
 
 
-def logGamma(z, **kwargs):
+def logGamma(z, gamma_0=-1.699, gamma_a=4.206, gamma_z=-0.809, **kwargs):
     a = 1./(1. + z)
-    return kwargs['gamma_0'] + kwargs['gamma_a']*(a - 1.) + kwargs['gamma_z']*z
+    return gamma_0 + gamma_a*(1.-a) + gamma_z*z
 
 
-def delta(z, **kwargs):
-    return kwargs['delta_0']
+def delta_sfr(z, delta_0=0.055, **kwargs):
+    return delta_0 + np.zeros_like(z)
 
 
-def scatter(vmax, z, **kwargs):
-    return kwargs['sf_scatter']
+def _get_1d_arrays(*args):
+    results = [np.atleast_1d(arg) for arg in args]
+    sizes = [arr.size for arr in results]
+    npts = max(sizes)
+    msg = "All input arguments should be either a float or ndarray of shape ({0}, )"
+    assert set(sizes) <= set((1, npts)), msg.format(npts)
+    return [np.zeros(npts).astype(arr.dtype) + arr for arr in results]

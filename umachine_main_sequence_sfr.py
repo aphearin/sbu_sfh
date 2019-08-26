@@ -5,6 +5,16 @@ import numpy as np
 
 def mean_sfr(vmax, z, **kwargs):
     """
+    Parameters
+    ----------
+    vmax : ndarray
+        Vmax [physical km/s] for a halo of the input mass at the input redshift
+
+    redshift : float or ndarray
+
+    Returns
+    -------
+    mean_sfr : ndarray
     """
     vmax, z = _get_1d_arrays(vmax, z)
 

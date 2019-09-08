@@ -1,4 +1,5 @@
-"""
+"""Analytical model in UniverseMachine for the relation between
+SFR and Vmax for main-sequence galaxies
 """
 import numpy as np
 

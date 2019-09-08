@@ -1,6 +1,27 @@
-"""Fitting functions from Behroozi+13 and Behroozi+18 for the evolution of halo mass and Vmax.
+"""Starting from a halo mass at z=0, the two functions below give descriptions for
+how halo mass and Vmax smoothly evolve across time.
 """
 import numpy as np
+
+
+def halo_mass_vs_redshift(halo_mass_at_z0, redshift):
+    """Fitting function from Behroozi+13, https://arxiv.org/abs/1207.6105,
+    Equations (H2)-(H6). Calibration assumes h=0.7.
+
+    Parameters
+    ----------
+    halo_mass_at_z0 : float or ndarray
+        Mass of the halo at z=0 assuming h=0.7.
+
+    redshift : float or ndarray
+
+    Returns
+    -------
+    halo_mass : ndarray
+        Mass of the halo at the input redshift assuming h=0.7.
+    """
+    M0, z = _get_1d_arrays(halo_mass_at_z0, redshift)
+    return _M13(z)*10**_f(M0, z)
 
 
 def vmax_vs_mhalo_and_redshift(mhalo, redshift):
@@ -29,26 +50,6 @@ def vmax_vs_mhalo_and_redshift(mhalo, redshift):
     numerator = 1.64e12
     mpivot = numerator/(denom_term1 + denom_term2)
     return 200.*(mhalo/mpivot)**(1/3.)
-
-
-def halo_mass_vs_redshift(halo_mass_at_z0, redshift):
-    """Fitting function from Behroozi+13, https://arxiv.org/abs/1207.6105,
-    Equations (H2)-(H6). Calibration assumes h=0.7.
-
-    Parameters
-    ----------
-    halo_mass_at_z0 : float or ndarray
-        Mass of the halo at z=0 assuming h=0.7.
-
-    redshift : float or ndarray
-
-    Returns
-    -------
-    halo_mass : ndarray
-        Mass of the halo at the input redshift assuming h=0.7.
-    """
-    M0, z = _get_1d_arrays(halo_mass_at_z0, redshift)
-    return _M13(z)*10**_f(M0, z)
 
 
 def _M13(z):
